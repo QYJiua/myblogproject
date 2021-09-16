@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>购买商品的用户列表展示</title>
+</head>
+<body>
+商品名：{{ goods.gname }}
+<br>
+购买该商品的用户有：
+<br>
+{% for user in goods.users %}
+    <a href="{{ url_for('goods.show_goods') }}?uid={{ user.id }}">{{ user.username }}</a>
+
+{% endfor %}
+
+
+</body>
+</html>

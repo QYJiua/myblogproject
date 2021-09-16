@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %}
+
+{% endblock %}
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/center.css') }}">
+
+{% endblock %}
+
+{% block newcontent %}
+    <div id="container">
+        <div id="left">
+            <p>用户信息修改</p>
+            <p>发表文章</p>
+            <p>管理相册</p>
+            <p>管理留言</p>
+            <p>关于我设置</p>
+        </div>
+        <div id="right">
+            <div class="right1">
+                <h2>用户信息修改</h2>
+                {# 带文件上传必填enctype               #}
+                <form action="{{ url_for('user.user_edit') }}" method="post" enctype="multipart/form-data">
+                    <p>
+                        <img src="{% if user.icon %} {{ url_for('static', filename=user.icon ) }} {% else %} {{ url_for('static', filename='images/touxiang.jpg' ) }} {% endif %}"
+                             alt="" width="90" height="100">
+                        {#                        <img src="{{ url_for('static', filename='images/touxiang.jpg' ) }}" alt="" width="90" height="100">#}
+                    </p>
+                    <p><input type="file" id="exampleInputFile" name="icon" alt="更换"></p>
+
+
+                    <p><input type="text" class="form-control" id="InputUsername" name="username"
+                              value="{{ g.user.username }}"></p>
+                    <p><input type="text" class="form-control" id="InputPhone" name="phone" value="{{ g.user.phone }}">
+                        <span></span></p>
+                    <p><input type="text" class="form-control" id="InputEmail" name="email" value="{{ g.user.email }}">
+                    </p>
+
+                    <p>
+                        <button type="submit" class="btn btn-primary">用户信息修改</button>
+                    </p>
+                </form>
+            </div>
+            <div class="right1" style="padding-top: 20px;">
+                <form action="{{ url_for('article.publish_article') }}" method="post">
+                    <p>
+                        <input type="text" class="form-control" id="InputTitle" name="title"
+                               placeholder="请输入文章标题">
+                    </p>
+                    <p>
+                        <select name="type" class="form-control">
+                            <option value="0">请选择文章分类</option>
+                            {% for type in types %}
+                                <option value="{{ type.id }}">{{ type.type_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p>
+                        <textarea name="content" class="mytextarea">
+                        </textarea>
+                    </p>
+                <p style="text-align: right;">
+                    <button type="submit" class="btn btn-primary">发表文章</button>
+                </p>
+                </form>
+            </div>
+            <div class="right1">
+                <form action="{{ url_for('user.upload_photo') }}" method="post" enctype="multipart/form-data" class="form-inline">
+                    <input type="file" name="photo" class="form-control">
+                    <input type="submit" value="上传相册" class="btn btn-default">
+                </form>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3>我的相册</h3>
+                        <div class="row">
+{#                            {% for photo in photos %}#
+{#                             <div class="col-xs-8 col-sm-4">#}
+{#                                <img src="七牛云存储共有空间域名/{{ photo.photo_name }}" alt="" class="img-rounded image">#}
+{#                            </div>#}
+{#                            {% endfor %}#}
+                            <div class="col-xs-8 col-sm-4">
+                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="" class="img-rounded image">
+                            </div>
+                            <div class="col-xs-8 col-sm-4">
+                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="" class="img-rounded image">
+                            </div>
+                            <div class="col-xs-8 col-sm-4">
+                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="" class="img-rounded image">
+                            </div>
+                            <div class="col-xs-8 col-sm-4">
+                                <img src="{{ url_for('static',filename='images/touxiang.jpg') }}" alt="" class="img-rounded image">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="right1">
+                管理留言
+            </div>
+            <div class="right1">
+                关于我设置
+            </div>
+
+
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static',filename='tinymce/tinymce.min.js') }}"></script>
+    <script>
+
+        $(function () {
+            // 设置富文本
+            tinymce.init({
+                selector: '.mytextarea',
+                height: 400,
+                plugins: 'quickbars emoticons',
+                inline: false,
+                toolbar: true,
+                menubar: true,
+                quickbars_selection_toolbar: 'bold italic | link h2 h3 blockquote',
+                quickbars_insert_toolbar: 'quickimage quicktable',
+
+            });
+
+            //显示隐藏登录方式
+            $(".right1").hide();
+            $(".right1").first().show();
+            $("#left p").each(function (i) {
+                $(this).click(function () {
+                    $('#left p').css({'background-color': 'rgba(30, 150, 196, 0.94)'});
+                    $(this).css({'background-color': 'skyblue', 'box-shadow': '5px 5px 5px deepskyblue'});
+
+                    $(".right1").hide();
+                    $(".right1").eq(i).show();
+                })
+            });
+            // 发送验证码
+            $('#btnCheck').click(function () {
+                let phone = $('#inputPhone').val();
+                let span_ele = $('#inputPhone').next('span');
+                span_ele.css({"color": "#ff0011", "font-size": "12px"});
+                if (phone.length == 11) {
+                    // 发送ajax请求
+                    $.get('{{ url_for('user.send_message') }}', {phone: phone}, function (data) {
+                        // 发送验证码结果
+                        if (data.code == 200) {
+                            alert('短信发送成功请查收');
+                        } else {
+                            alert(data.msg);
+                        }
+                    });
+                }
+                else {
+                    span_ele.text('必须输入11位手机号码')
+                }
+            });
+        })
+    </script>
+{% endblock %}

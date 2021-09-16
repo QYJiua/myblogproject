@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户购买列表</title>
+</head>
+<body>
+用户名：{{ user.username }}<br>
+{% set total_price = [] %}
+{% for goods in user.goodslist %}
+    <input type="hidden" value="{{   total_price.append(goods.price) }}">
+<p>{{ goods.gname }} -- {{ goods.price }}</p>
+{% endfor %}
+<p>总计：{{ total_price|sum_li }}</p>
+</body>
+</html>
